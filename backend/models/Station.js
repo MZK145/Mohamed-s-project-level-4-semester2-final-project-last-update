@@ -1,4 +1,3 @@
-// models/Station.js
 const mongoose = require('mongoose');
 
 function normalizeLocationValue(value) {
@@ -28,7 +27,6 @@ const stationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// A station should only exist once on a specific metro line.
 stationSchema.index({ name: 1, line: 1 }, { unique: true });
 
 module.exports = mongoose.model('Station', stationSchema);
