@@ -15,7 +15,10 @@ router.get('/', requireAdmin, async (req, res, next) => {
 });
 
 router.get('/online', requireAdmin, (req, res) => {
-  res.status(200).json({ count: getOnlineCount(), type: 'passengers' });
+  res.status(200).json({
+    count: getOnlineCount(req.app.locals.io),
+    type: 'passengers-in-waiting-rooms'
+  });
 });
 
 router.get('/waiting-rooms', requireAdmin, async (req, res, next) => {
@@ -42,6 +45,7 @@ router.get('/waiting-rooms', requireAdmin, async (req, res, next) => {
     res.status(200).json({
       totalRooms: rooms.length,
       activeRooms: rooms.filter((room) => room.active).length,
+      onlinePassengers: getOnlineCount(io),
       rooms
     });
   } catch (err) {
