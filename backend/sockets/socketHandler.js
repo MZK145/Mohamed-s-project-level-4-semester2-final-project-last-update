@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-const onlineUsers = new Map();
 const socketStations = new Map();
 
 function normalizeId(value) {
@@ -20,9 +19,22 @@ function getRoomPassengerCount(io, stationId) {
   let count = 0;
   for (const socketId of room) {
     const roomSocket = io.sockets.sockets.get(socketId);
-    if (roomSocket && roomSocket.data.role !== 'admin') count += 1;
+    if (roomSocket?.data.role === 'user') count += 1;
   }
   return count;
+}
+
+function getOnlineCount(io) {
+  if (!io) return 0;
+
+  const userIds = new Set();
+  for (const socketId of socketStations.keys()) {
+    const roomSocket = io.sockets.sockets.get(socketId);
+    if (roomSocket?.data.role === 'user' && roomSocket.data.userId) {
+      userIds.add(String(roomSocket.data.userId));
+    }
+  }
+  return userIds.size;
 }
 
 function emitPresence(io, stationId) {
@@ -31,23 +43,6 @@ function emitPresence(io, stationId) {
     stationId,
     count: getRoomPassengerCount(io, stationId)
   });
-}
-
-function registerPassengerSocket(socket) {
-  if (socket.data.role !== 'user' || !socket.data.userId) return;
-  const userId = String(socket.data.userId);
-  onlineUsers.set(userId, onlineUsers.get(userId) || new Set());
-  onlineUsers.get(userId).add(socket.id);
-}
-
-function unregisterSocket(socketId) {
-  for (const [userId, sockets] of onlineUsers) {
-    if (!sockets.has(socketId)) continue;
-    sockets.delete(socketId);
-    if (sockets.size === 0) onlineUsers.delete(userId);
-    return userId;
-  }
-  return null;
 }
 
 function leaveStation(io, socket) {
@@ -80,10 +75,8 @@ function socketHandler(io) {
   });
 
   io.on('connection', (socket) => {
-    registerPassengerSocket(socket);
     console.log(`🔌 ${socket.data.role} connected: ${socket.id}`);
-    socket.emit('onlineCount', getOnlineCount());
-    io.emit('onlineCount', getOnlineCount());
+    socket.emit('onlineCount', getOnlineCount(io));
 
     socket.on('register', (rawUserId) => {
       const requestedId = normalizeId(
@@ -111,6 +104,7 @@ function socketHandler(io) {
       const oldStationId = socketStations.get(socket.id);
       if (oldStationId === stationId) {
         emitPresence(io, stationId);
+        io.emit('onlineCount', getOnlineCount(io));
         return;
       }
 
@@ -120,27 +114,22 @@ function socketHandler(io) {
       socketStations.set(socket.id, stationId);
       console.log(`🚉 ${socket.id} joined station room ${stationId} as ${socket.data.role}`);
       emitPresence(io, stationId);
+      io.emit('onlineCount', getOnlineCount(io));
     });
 
     socket.on('leaveStation', () => {
       const stationId = leaveStation(io, socket);
       if (stationId) console.log(`🚉 ${socket.id} left station room ${stationId}`);
+      io.emit('onlineCount', getOnlineCount(io));
     });
 
     socket.on('disconnect', (reason) => {
       const stationId = leaveStation(io, socket);
-      const userId = unregisterSocket(socket.id);
-
       if (stationId) emitPresence(io, stationId);
-      if (userId) io.emit('onlineCount', getOnlineCount());
-
+      io.emit('onlineCount', getOnlineCount(io));
       console.log(`🔌 Socket ${socket.id} disconnected (${reason})`);
     });
   });
-}
-
-function getOnlineCount() {
-  return onlineUsers.size;
 }
 
 function getStationPresence(io, stationId) {
