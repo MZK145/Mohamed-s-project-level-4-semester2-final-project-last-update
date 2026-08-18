@@ -1,6 +1,7 @@
 // sockets/socketHandler.js
-// Tracks authenticated users and station-room presence.
-const onlineUsers = new Map(); // userId -> Set(socket ids)
+// Tracks authenticated passengers and station-room presence.
+// Admin sockets may join rooms to monitor them, but they are never counted as passengers.
+const onlineUsers = new Map(); // passenger userId -> Set(socket ids)
 const socketStations = new Map(); // socket id -> stationId
 
 function normalizeId(value) {
@@ -13,16 +14,23 @@ function stationRoom(stationId) {
   return `station:${stationId}`;
 }
 
-function getRoomCount(io, stationId) {
+function getRoomPassengerCount(io, stationId) {
   const room = io.sockets.adapter.rooms.get(stationRoom(stationId));
-  return room ? room.size : 0;
+  if (!room) return 0;
+
+  let count = 0;
+  for (const socketId of room) {
+    const roomSocket = io.sockets.sockets.get(socketId);
+    if (roomSocket && roomSocket.data.role !== 'admin') count += 1;
+  }
+  return count;
 }
 
 function emitPresence(io, stationId) {
   if (!stationId) return;
   io.to(stationRoom(stationId)).emit('presenceUpdate', {
     stationId,
-    count: getRoomCount(io, stationId)
+    count: getRoomPassengerCount(io, stationId)
   });
 }
 
@@ -49,23 +57,33 @@ function leaveStation(io, socket) {
 function socketHandler(io) {
   io.on('connection', (socket) => {
     console.log(`🔌 New client connected: ${socket.id}`);
+    socket.data.role = 'user';
     socket.emit('onlineCount', getOnlineCount());
 
-    socket.on('register', (rawUserId) => {
+    socket.on('register', (payload) => {
+      // Backwards compatible with older clients that send only the user id.
+      const rawUserId = typeof payload === 'string' ? payload : payload?.userId;
+      const role = typeof payload === 'object' && payload?.role === 'admin' ? 'admin' : 'user';
       const userId = normalizeId(rawUserId);
+
       if (!userId) {
         socket.emit('registerError', { message: 'A valid user id is required' });
         return;
       }
 
       unregisterSocket(socket.id);
-      onlineUsers.set(userId, onlineUsers.get(userId) || new Set());
-      onlineUsers.get(userId).add(socket.id);
       socket.data.userId = userId;
+      socket.data.role = role;
 
-      socket.emit('registered', { userId });
+      // Admin sockets can observe rooms, but do not enter the passenger count.
+      if (role === 'user') {
+        onlineUsers.set(userId, onlineUsers.get(userId) || new Set());
+        onlineUsers.get(userId).add(socket.id);
+      }
+
+      socket.emit('registered', { userId, role });
       io.emit('onlineCount', getOnlineCount());
-      console.log(`👤 User ${userId} online (${onlineUsers.get(userId).size} socket(s))`);
+      console.log(`👤 ${role === 'admin' ? 'Admin' : 'Passenger'} ${userId} online`);
     });
 
     socket.on('joinStation', (rawStationId) => {
@@ -85,7 +103,7 @@ function socketHandler(io) {
 
       socket.join(stationRoom(stationId));
       socketStations.set(socket.id, stationId);
-      console.log(`🚉 ${socket.id} joined station room ${stationId}`);
+      console.log(`🚉 ${socket.id} joined station room ${stationId} as ${socket.data.role}`);
       emitPresence(io, stationId);
     });
 
@@ -110,4 +128,12 @@ function getOnlineCount() {
   return onlineUsers.size;
 }
 
-module.exports = { socketHandler, getOnlineCount };
+function getStationPresence(io, stationId) {
+  return getRoomPassengerCount(io, stationId);
+}
+
+module.exports = {
+  socketHandler,
+  getOnlineCount,
+  getStationPresence
+};
