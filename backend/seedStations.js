@@ -11,17 +11,23 @@ async function seedStations() {
 
   await mongoose.connect(process.env.MONGO_URI);
 
-  const operations = defaultStations.map((station) => ({
+  // Keep one seed definition per station/line and sync location metadata.
+  const uniqueStations = Array.from(
+    new Map(defaultStations.map((station) => [`${station.name}|${station.line}`, station])).values()
+  );
+
+  const operations = uniqueStations.map((station) => ({
     updateOne: {
       filter: { name: station.name, line: station.line },
-      update: { $setOnInsert: station },
+      update: { $set: station },
       upsert: true
     }
   }));
 
   const result = await Station.bulkWrite(operations, { ordered: false });
   const inserted = result.upsertedCount || 0;
-  console.log(`Station seed completed: ${inserted} added, ${defaultStations.length - inserted} already present.`);
+  const modified = result.modifiedCount || 0;
+  console.log(`Station seed completed: ${inserted} added, ${modified} synchronized, ${uniqueStations.length} total.`);
 }
 
 seedStations()
