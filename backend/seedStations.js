@@ -11,7 +11,6 @@ async function seedStations() {
 
   await mongoose.connect(process.env.MONGO_URI);
 
-  // Keep one seed definition per station/line and sync location metadata.
   const uniqueStations = Array.from(
     new Map(defaultStations.map((station) => [`${station.name}|${station.line}`, station])).values()
   );
