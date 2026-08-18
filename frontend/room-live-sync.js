@@ -6,8 +6,7 @@
   );
 
   function formatTime(value) {
-    if (!value) return 'N/A';
-    return value;
+    return value || 'N/A';
   }
 
   function getStationById(stations, id) {
@@ -62,6 +61,40 @@
     }
   }
 
+  function updateAdminRoom(stations) {
+    if (!window.__adminRoomId) return;
+    const station = getStationById(stations, window.__adminRoomId);
+    if (!station) return;
+
+    const container = document.getElementById('adminViewContainer');
+    if (!container) return;
+
+    const title = container.querySelector('h3');
+    const description = container.querySelector('h3 + p');
+
+    if (title) title.textContent = `👁️ ${station.name} Room`;
+    if (description) {
+      description.textContent = 'Admin observer mode — not included in passenger counts.';
+    }
+
+    let metadata = container.querySelector('#adminRoomMetadata');
+    if (!metadata) {
+      const presence = container.querySelector('#adminRoomPresence');
+      metadata = document.createElement('div');
+      metadata.id = 'adminRoomMetadata';
+      metadata.style.cssText = 'padding:12px 14px;background:#0f172a;border:1px solid #334155;border-radius:12px;color:#cbd5e1;margin-bottom:14px;';
+      if (presence) presence.insertAdjacentElement('beforebegin', metadata);
+    }
+
+    metadata.innerHTML = `
+      <strong>${escapeHtml(station.name)}</strong><br>
+      Line: ${escapeHtml(station.line || 'N/A')} &nbsp;|&nbsp;
+      Order: ${Number(station.order || 0)} &nbsp;|&nbsp;
+      Arrival: ${escapeHtml(formatTime(station.arrivalTime))} &nbsp;|&nbsp;
+      Departure: ${escapeHtml(formatTime(station.departureTime))}
+    `;
+  }
+
   async function refreshLiveRoomData() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/stations`);
@@ -71,18 +104,7 @@
 
       window.__liveRoomStations = stations;
       updatePassengerRoom(stations);
-
-      if (window.__adminRoomId) {
-        const station = getStationById(stations, window.__adminRoomId);
-        const title = document.getElementById('adminRoomTitle');
-        const meta = document.getElementById('adminRoomMeta');
-        if (station) {
-          if (title) title.textContent = `👁️ ${station.name} Room`;
-          if (meta) {
-            meta.textContent = `${station.line || 'N/A'} · Order ${Number(station.order || 0)} · Arrival ${formatTime(station.arrivalTime)} · Departure ${formatTime(station.departureTime)}`;
-          }
-        }
-      }
+      updateAdminRoom(stations);
 
       if (typeof currentAdminView !== 'undefined' && currentAdminView === 'stations' && typeof loadAdminStations === 'function') {
         loadAdminStations();
@@ -92,17 +114,20 @@
     }
   }
 
+  function attachSocketListener() {
+    const socket = window.__metroSocket;
+    if (!socket || socket.__liveRoomSyncAttached) return Boolean(socket);
+
+    socket.__liveRoomSyncAttached = true;
+    socket.on('stationsUpdated', refreshLiveRoomData);
+    return true;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    window.addEventListener('stationsUpdated', refreshLiveRoomData);
-    if (window.io && typeof window.io === 'function') {
-      const checkSocket = setInterval(() => {
-        const socket = window.__metroSocket;
-        if (!socket) return;
-        clearInterval(checkSocket);
-        socket.on('stationsUpdated', refreshLiveRoomData);
-      }, 250);
-      setTimeout(() => clearInterval(checkSocket), 10000);
-    }
+    const checkSocket = setInterval(() => {
+      if (attachSocketListener()) clearInterval(checkSocket);
+    }, 250);
+    setTimeout(() => clearInterval(checkSocket), 10000);
   });
 
   window.refreshLiveRoomData = refreshLiveRoomData;
