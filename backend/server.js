@@ -1,4 +1,3 @@
-// server.js
 require('dotenv').config();
 const app = require('./app');
 const mongoose = require('mongoose');
@@ -24,7 +23,6 @@ const io = new Server(server, {
   transports: ['polling', 'websocket']
 });
 
-// Store io in app.locals for use in routes.
 app.locals.io = io;
 
 async function startServer() {
