@@ -1,10 +1,7 @@
-// sockets/socketHandler.js
-// Authenticated passenger/admin socket tracking.
-// Admin sockets may monitor rooms, but they are never counted as passengers.
 const jwt = require('jsonwebtoken');
 
-const onlineUsers = new Map(); // passenger userId -> Set(socket ids)
-const socketStations = new Map(); // socket id -> stationId
+const onlineUsers = new Map();
+const socketStations = new Map();
 
 function normalizeId(value) {
   if (value === null || value === undefined) return null;
@@ -93,7 +90,6 @@ function socketHandler(io) {
         typeof rawUserId === 'object' ? rawUserId?.userId : rawUserId
       );
 
-      // The JWT is the source of truth for identity and role.
       if (requestedId && requestedId !== String(socket.data.userId)) {
         socket.emit('registerError', { message: 'Socket identity does not match the logged-in account' });
         return;
