@@ -1,7 +1,3 @@
-// frontend/admin-enhancements.js
-// Adds a clearer admin control center and keeps the passenger journey separate.
-// Socket identity is authenticated by the backend from the JWT.
-
 (function () {
   const API_BASE_URL = window.BACKEND_URL || (
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -9,7 +5,6 @@
       : window.location.origin
   );
 
-  // Attach the JWT to every Socket.io connection created by the existing app.
   const originalIo = window.io;
   if (typeof originalIo === 'function') {
     window.io = function (...args) {
