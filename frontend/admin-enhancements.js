@@ -138,12 +138,17 @@
     if (!socket || !container) return;
 
     window.__adminRoomId = String(stationId);
-    socket.emit('joinStation', String(stationId));
 
     container.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
-        <div><h3 style="margin:0;color:#f8fafc;">👁️ ${escape(stationName)} Room</h3><p style="margin:5px 0 0;color:#94a3b8;font-size:13px;">Admin observer mode — not included in passenger counts.</p></div>
-        <button id="backToRooms" type="button" class="back-btn">← All Rooms</button>
+        <div>
+          <h3 style="margin:0;color:#f8fafc;">👁️ ${escape(stationName)} Room</h3>
+          <p style="margin:5px 0 0;color:#94a3b8;font-size:13px;">Admin observer mode — not included in passenger counts.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="editAdminRoomStation" type="button" class="submit-btn" style="margin:0;background:#8b5cf6;">✏️ Edit Station / Destination</button>
+          <button id="backToRooms" type="button" class="back-btn">← All Rooms</button>
+        </div>
       </div>
       <div id="adminRoomPresence" style="padding:14px;background:#0f172a;border:1px solid #334155;border-radius:12px;color:#cbd5e1;margin-bottom:14px;">👥 Waiting passengers: <strong>0</strong></div>
       <div id="adminRoomAnnouncements" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -160,14 +165,22 @@
     window.__adminPresenceHandler = presenceHandler;
     socket.on('presenceUpdate', presenceHandler);
 
+    document.getElementById('editAdminRoomStation').addEventListener('click', () => {
+      if (typeof window.editStation === 'function') {
+        window.editStation(String(stationId));
+      }
+    });
+
     document.getElementById('backToRooms').addEventListener('click', () => {
       socket.emit('leaveStation');
       window.__adminRoomId = null;
       showWaitingRooms();
     });
 
+    socket.emit('joinStation', String(stationId));
+
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/${stationId}/announcements?limit=15`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/stations/${stationId}/announcements?limit=15`);
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Could not load announcements');
       const announcements = Array.isArray(data.items) ? data.items : [];
@@ -178,8 +191,6 @@
     } catch (error) {
       document.getElementById('adminRoomAnnouncements').innerHTML = `<div style="color:#fca5a5;">${escape(error.message)}</div>`;
     }
-
-    socket.emit('joinStation', String(stationId));
   }
 
   const originalRenderAdmin = window.renderAdminDashboard;
