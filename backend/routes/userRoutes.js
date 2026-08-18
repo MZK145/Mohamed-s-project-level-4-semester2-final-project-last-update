@@ -5,7 +5,6 @@ const Station = require('../models/Station');
 const requireAdmin = require('../middleware/requireAdmin');
 const { getOnlineCount, getStationPresence } = require('../sockets/socketHandler');
 
-// GET total number of registered users (admin only)
 router.get('/', requireAdmin, async (req, res, next) => {
   try {
     const count = await User.countDocuments();
@@ -15,13 +14,10 @@ router.get('/', requireAdmin, async (req, res, next) => {
   }
 });
 
-// GET online passenger count (admin sockets are intentionally excluded).
 router.get('/online', requireAdmin, (req, res) => {
   res.status(200).json({ count: getOnlineCount(), type: 'passengers' });
 });
 
-// GET all station waiting rooms with their live passenger count.
-// Admins can use this to choose a room to monitor.
 router.get('/waiting-rooms', requireAdmin, async (req, res, next) => {
   try {
     const io = req.app.locals.io;
