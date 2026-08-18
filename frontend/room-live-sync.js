@@ -13,18 +13,17 @@
     return stations.find((station) => String(station._id) === String(id));
   }
 
+  function rememberDestinationId(stations) {
+    if (window.__selectedDestinationStationId) return;
+    if (typeof selectedDestination === 'undefined' || !selectedDestination) return;
+    const station = stations.find((item) => item.name === selectedDestination);
+    if (station) window.__selectedDestinationStationId = String(station._id);
+  }
+
   function getSelectedDestinationStation(stations) {
-    if (window.__selectedDestinationStationId) {
-      return getStationById(stations, window.__selectedDestinationStationId);
-    }
-
-    if (typeof selectedDestination !== 'undefined' && selectedDestination) {
-      const station = stations.find((item) => item.name === selectedDestination);
-      if (station) window.__selectedDestinationStationId = String(station._id);
-      return station;
-    }
-
-    return null;
+    rememberDestinationId(stations);
+    if (!window.__selectedDestinationStationId) return null;
+    return getStationById(stations, window.__selectedDestinationStationId);
   }
 
   function updatePassengerRoom(stations) {
@@ -73,9 +72,7 @@
     const description = container.querySelector('h3 + p');
 
     if (title) title.textContent = `👁️ ${station.name} Room`;
-    if (description) {
-      description.textContent = 'Admin observer mode — not included in passenger counts.';
-    }
+    if (description) description.textContent = 'Admin observer mode — not included in passenger counts.';
 
     let metadata = container.querySelector('#adminRoomMetadata');
     if (!metadata) {
@@ -103,6 +100,7 @@
       if (!Array.isArray(stations)) return;
 
       window.__liveRoomStations = stations;
+      rememberDestinationId(stations);
       updatePassengerRoom(stations);
       updateAdminRoom(stations);
 
@@ -128,6 +126,13 @@
       if (attachSocketListener()) clearInterval(checkSocket);
     }, 250);
     setTimeout(() => clearInterval(checkSocket), 10000);
+
+    setInterval(() => {
+      const waitingRoom = document.getElementById('waitingRoom');
+      if (waitingRoom && waitingRoom.style.display !== 'none') {
+        rememberDestinationId(window.__liveRoomStations || []);
+      }
+    }, 1000);
   });
 
   window.refreshLiveRoomData = refreshLiveRoomData;
