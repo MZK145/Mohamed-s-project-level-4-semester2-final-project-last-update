@@ -214,13 +214,16 @@
       document.getElementById('adminRoomAnnouncements').innerHTML = `<div style="color:#fca5a5;">${escape(error.message)}</div>`;
     }
 
+    const previousHandler = window.__adminPresenceHandler;
+    if (previousHandler) socket.off('presenceUpdate', previousHandler);
+
     const updatePresence = ({ stationId: incomingId, count }) => {
       if (String(incomingId) !== String(stationId)) return;
       const target = document.getElementById('adminRoomPresence');
       if (target) target.innerHTML = `👥 Waiting passengers: <strong>${Number(count || 0)}</strong>`;
     };
 
-    socket.off('adminRoomPresence');
+    window.__adminPresenceHandler = updatePresence;
     socket.on('presenceUpdate', updatePresence);
     socket.emit('joinStation', String(stationId));
   }
@@ -262,14 +265,11 @@
     if (localStorage.getItem('role') !== 'admin') return;
     const online = document.getElementById('adminOnlineCountDisplay');
     if (online && window.__metroSocket?.connected) {
-      // The original socket handler emits the passenger-only count after registration.
-      // This keeps the admin label explicit.
       const label = online.parentElement?.querySelector('div:last-child');
       if (label) label.textContent = '👥 Online Passengers';
     }
   }, 1000);
 
-  // Refresh waiting-room cards while the admin is viewing the room list.
   setInterval(() => {
     const role = localStorage.getItem('role');
     if (role !== 'admin' || window.__adminRoomId) return;
