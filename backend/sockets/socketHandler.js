@@ -1,6 +1,8 @@
 // sockets/socketHandler.js
-// Tracks authenticated passengers and station-room presence.
-// Admin sockets may join rooms to monitor them, but they are never counted as passengers.
+// Authenticated passenger/admin socket tracking.
+// Admin sockets may monitor rooms, but they are never counted as passengers.
+const jwt = require('jsonwebtoken');
+
 const onlineUsers = new Map(); // passenger userId -> Set(socket ids)
 const socketStations = new Map(); // socket id -> stationId
 
@@ -34,6 +36,13 @@ function emitPresence(io, stationId) {
   });
 }
 
+function registerPassengerSocket(socket) {
+  if (socket.data.role !== 'user' || !socket.data.userId) return;
+  const userId = String(socket.data.userId);
+  onlineUsers.set(userId, onlineUsers.get(userId) || new Set());
+  onlineUsers.get(userId).add(socket.id);
+}
+
 function unregisterSocket(socketId) {
   for (const [userId, sockets] of onlineUsers) {
     if (!sockets.has(socketId)) continue;
@@ -55,35 +64,45 @@ function leaveStation(io, socket) {
 }
 
 function socketHandler(io) {
+  io.use((socket, next) => {
+    try {
+      const token = socket.handshake.auth?.token;
+      if (!token) return next(new Error('Socket authentication required'));
+
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      if (!payload?.id || !['admin', 'user'].includes(payload.role)) {
+        return next(new Error('Invalid socket identity'));
+      }
+
+      socket.data.userId = normalizeId(payload.id);
+      socket.data.role = payload.role;
+      next();
+    } catch (error) {
+      next(new Error('Invalid or expired socket token'));
+    }
+  });
+
   io.on('connection', (socket) => {
-    console.log(`🔌 New client connected: ${socket.id}`);
-    socket.data.role = 'user';
+    registerPassengerSocket(socket);
+    console.log(`🔌 ${socket.data.role} connected: ${socket.id}`);
     socket.emit('onlineCount', getOnlineCount());
+    io.emit('onlineCount', getOnlineCount());
 
-    socket.on('register', (payload) => {
-      // Backwards compatible with older clients that send only the user id.
-      const rawUserId = typeof payload === 'string' ? payload : payload?.userId;
-      const role = typeof payload === 'object' && payload?.role === 'admin' ? 'admin' : 'user';
-      const userId = normalizeId(rawUserId);
+    socket.on('register', (rawUserId) => {
+      const requestedId = normalizeId(
+        typeof rawUserId === 'object' ? rawUserId?.userId : rawUserId
+      );
 
-      if (!userId) {
-        socket.emit('registerError', { message: 'A valid user id is required' });
+      // The JWT is the source of truth for identity and role.
+      if (requestedId && requestedId !== String(socket.data.userId)) {
+        socket.emit('registerError', { message: 'Socket identity does not match the logged-in account' });
         return;
       }
 
-      unregisterSocket(socket.id);
-      socket.data.userId = userId;
-      socket.data.role = role;
-
-      // Admin sockets can observe rooms, but do not enter the passenger count.
-      if (role === 'user') {
-        onlineUsers.set(userId, onlineUsers.get(userId) || new Set());
-        onlineUsers.get(userId).add(socket.id);
-      }
-
-      socket.emit('registered', { userId, role });
-      io.emit('onlineCount', getOnlineCount());
-      console.log(`👤 ${role === 'admin' ? 'Admin' : 'Passenger'} ${userId} online`);
+      socket.emit('registered', {
+        userId: String(socket.data.userId),
+        role: socket.data.role
+      });
     });
 
     socket.on('joinStation', (rawStationId) => {
