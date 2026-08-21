@@ -123,10 +123,18 @@
     </div>
   </div>
 
+  <script>
+    window.BACKEND_URL = window.BACKEND_URL || (
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:5000'
+        : window.location.origin
+    );
+  </script>
   <script src="script.js"></script>
   <script src="admin-enhancements.js"></script>
   <script src="admin-live.js"></script>
   <script src="fix-sync.js"></script>
   <script src="room-live-sync.js"></script>
+  <script src="workflow-compat.js"></script>
 </body>
 </html>
