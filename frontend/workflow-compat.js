@@ -35,10 +35,12 @@
   const originalIo = window.io;
   if (typeof originalIo === 'function') {
     window.io = function (...args) {
-      const options = args[1] && typeof args[1] === 'object' ? { ...args[1] } : {};
+      const callArgs = [...args];
+      const options = callArgs[1] && typeof callArgs[1] === 'object' ? { ...callArgs[1] } : {};
       const token = localStorage.getItem('token');
       if (token) options.auth = { ...(options.auth || {}), token };
-      const socket = originalIo(...args, options);
+      callArgs[1] = options;
+      const socket = originalIo(...callArgs);
       window.__metroSocket = socket;
       attachSocketWorkflow(socket);
       return socket;
