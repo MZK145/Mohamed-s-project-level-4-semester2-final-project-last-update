@@ -1,4 +1,4 @@
-/* MetroSync: one safe live-sync path for station changes. */
+/* MetroSync: one canonical live-sync path for station changes. */
 (function () {
   const API_BASE_URL = window.BACKEND_URL || (
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -6,11 +6,16 @@
       : window.location.origin
   );
 
-  let refreshTimer = null;
   let refreshInFlight = false;
   let originalShowAdminDashboard = null;
+  let originalRefreshStationsData = null;
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const escapeHtml = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 
   async function fetchStationsFresh() {
     const response = await fetch(`${API_BASE_URL}/api/v1/stations`, {
@@ -58,6 +63,63 @@
 
     if (restoredStation && [...station.options].some(option => option.value === restoredStation.name)) {
       station.value = restoredStation.name;
+      if (typeof selectedOriginStationId !== 'undefined') selectedOriginStationId = restoredStation._id;
+      if (typeof selectedOrigin !== 'undefined') selectedOrigin = restoredStation.name;
+      if (typeof selectedOriginLine !== 'undefined') selectedOriginLine = restoredStation.line;
+    }
+  }
+
+  // Replace the original refresh function with a single no-cache refresh that
+  // also preserves the passenger's current selections. The main script's
+  // stationsUpdated listener will call this function after every edit/add/delete.
+  function installSafeStationRefresh() {
+    if (originalRefreshStationsData || typeof window.refreshStationsData !== 'function') return;
+    originalRefreshStationsData = window.refreshStationsData;
+
+    window.refreshStationsData = async function () {
+      const stations = await fetchStationsFresh();
+      preservePassengerSelections(stations);
+      return stations;
+    };
+  }
+
+  function updateAdminRoomFromStations(stations) {
+    if (!window.__adminRoomId) return;
+
+    const station = stations.find(item => String(item._id) === String(window.__adminRoomId));
+    const container = document.getElementById('adminViewContainer');
+    if (!station || !container) return;
+
+    const title = container.querySelector('h3');
+    if (title) title.textContent = `👁️ ${station.name} Room`;
+
+    const editButton = document.getElementById('editAdminRoomStation');
+    if (editButton) {
+      editButton.dataset.name = station.name;
+      editButton.textContent = '✏️ Edit Station / Destination';
+    }
+
+    const metadata = container.querySelector('#adminRoomMetadata');
+    if (metadata) {
+      metadata.innerHTML = `
+        <strong>${escapeHtml(station.name)}</strong><br>
+        Line: ${escapeHtml(station.line || 'N/A')} &nbsp;|&nbsp;
+        Governorate: ${escapeHtml(station.governorate || 'N/A')} &nbsp;|&nbsp;
+        City: ${escapeHtml(station.city || 'N/A')}<br>
+        Arrival: ${escapeHtml(station.arrivalTime || 'N/A')} &nbsp;|&nbsp;
+        Departure: ${escapeHtml(station.departureTime || 'N/A')}
+      `;
+    }
+  }
+
+  async function syncAdminRoom(stations) {
+    if (!window.__adminRoomId) return;
+    updateAdminRoomFromStations(stations);
+
+    const presence = document.getElementById('adminRoomPresence');
+    const socket = window.__metroSocket;
+    if (presence && socket?.connected) {
+      socket.emit('joinStation', String(window.__adminRoomId));
     }
   }
 
@@ -69,8 +131,11 @@
       const stations = await fetchStationsFresh();
       preservePassengerSelections(stations);
 
-      if (window.__adminRoomId && typeof window.refreshLiveRoomData === 'function') {
-        await window.refreshLiveRoomData();
+      // Never replace the active observer room with the dashboard after a
+      // station edit. Update the room in place instead.
+      if (window.__adminRoomId) {
+        await syncAdminRoom(stations);
+        return;
       }
 
       if (typeof currentAdminView !== 'undefined' && currentAdminView === 'stations' && typeof loadAdminStations === 'function') {
@@ -85,32 +150,6 @@
     }
   }
 
-  function scheduleSync() {
-    clearTimeout(refreshTimer);
-    refreshTimer = setTimeout(syncAfterStationUpdate, 150);
-  }
-
-  function updateAdminRoomFromStations(stations) {
-    if (!window.__adminRoomId) return;
-    const station = stations.find(item => String(item._id) === String(window.__adminRoomId));
-    const container = document.getElementById('adminViewContainer');
-    if (!station || !container) return;
-
-    const title = container.querySelector('h3');
-    if (title) title.textContent = `👁️ ${station.name} Room`;
-
-    const metadata = container.querySelector('#adminRoomMetadata');
-    if (metadata) {
-      metadata.innerHTML = `
-        <strong>${escapeHtml(station.name)}</strong><br>
-        Line: ${escapeHtml(station.line || 'N/A')} &nbsp;|&nbsp;
-        Order: ${Number(station.order || 0)} &nbsp;|&nbsp;
-        Arrival: ${escapeHtml(station.arrivalTime || 'N/A')} &nbsp;|&nbsp;
-        Departure: ${escapeHtml(station.departureTime || 'N/A')}
-      `;
-    }
-  }
-
   function installSafeDashboard() {
     if (originalShowAdminDashboard || typeof window.showAdminDashboard !== 'function') return;
     originalShowAdminDashboard = window.showAdminDashboard;
@@ -118,6 +157,10 @@
     window.showAdminDashboard = async function () {
       const container = document.getElementById('adminViewContainer');
       if (!container) return;
+
+      // An admin may be observing a room while another station is edited.
+      // Keep that room open rather than replacing it with the dashboard.
+      if (window.__adminRoomId) return;
 
       const previousHtml = container.innerHTML;
 
@@ -132,7 +175,7 @@
 
         if (attempt < 2) {
           container.innerHTML = previousHtml;
-          await sleep(250 * (attempt + 1));
+          await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)));
         }
       }
 
@@ -145,16 +188,14 @@
 
   function attach() {
     installSafeDashboard();
+    installSafeStationRefresh();
 
-    const socket = window.__metroSocket;
-    if (!socket || socket.__fixSyncAttached) return;
-
-    socket.__fixSyncAttached = true;
-    socket.__liveRoomSyncAttached = true;
-    socket.on('stationsUpdated', scheduleSync);
+    // The main script already listens for stationsUpdated. We intentionally do
+    // not register a second listener here because competing refresh callbacks
+    // caused dashboard/room race conditions after edits.
   }
 
+  attach();
   const timer = setInterval(attach, 200);
   setTimeout(() => clearInterval(timer), 15000);
-  attach();
 })();
