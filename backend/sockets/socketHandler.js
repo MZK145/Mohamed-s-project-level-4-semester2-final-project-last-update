@@ -61,7 +61,11 @@ function socketHandler(io) {
       const token = socket.handshake.auth?.token;
       if (!token) return next(new Error('Socket authentication required'));
 
-      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      const payload = jwt.verify(token, process.env.JWT_SECRET, {
+        issuer: 'metrosync-api',
+        audience: 'metrosync-client'
+      });
+
       if (!payload?.id || !['admin', 'user'].includes(payload.role)) {
         return next(new Error('Invalid socket identity'));
       }
@@ -69,13 +73,12 @@ function socketHandler(io) {
       socket.data.userId = normalizeId(payload.id);
       socket.data.role = payload.role;
       next();
-    } catch (error) {
+    } catch {
       next(new Error('Invalid or expired socket token'));
     }
   });
 
   io.on('connection', (socket) => {
-    console.log(`🔌 ${socket.data.role} connected: ${socket.id}`);
     socket.emit('onlineCount', getOnlineCount(io));
 
     socket.on('register', (rawUserId) => {
@@ -112,22 +115,18 @@ function socketHandler(io) {
 
       socket.join(stationRoom(stationId));
       socketStations.set(socket.id, stationId);
-      console.log(`🚉 ${socket.id} joined station room ${stationId} as ${socket.data.role}`);
       emitPresence(io, stationId);
       io.emit('onlineCount', getOnlineCount(io));
     });
 
     socket.on('leaveStation', () => {
-      const stationId = leaveStation(io, socket);
-      if (stationId) console.log(`🚉 ${socket.id} left station room ${stationId}`);
+      leaveStation(io, socket);
       io.emit('onlineCount', getOnlineCount(io));
     });
 
-    socket.on('disconnect', (reason) => {
-      const stationId = leaveStation(io, socket);
-      if (stationId) emitPresence(io, stationId);
+    socket.on('disconnect', () => {
+      leaveStation(io, socket);
       io.emit('onlineCount', getOnlineCount(io));
-      console.log(`🔌 Socket ${socket.id} disconnected (${reason})`);
     });
   });
 }
