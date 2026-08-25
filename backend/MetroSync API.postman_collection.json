@@ -1,0 +1,587 @@
+{
+  "info": {
+    "_postman_id": "3850ac52-7dfe-4b27-bef7-60f28284702d",
+    "name": "MetroSync API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54619601",
+    "_collection_link": "https://go.postman.co/collection/54619601-3850ac52-7dfe-4b27-bef7-60f28284702d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": [
+            {
+              "name": "login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"email\": \"admin@metro.com\",\r\n  \"password\": \"admin123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5000/api/v1/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5000",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "access-control-allow-credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "content-security-policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "cross-origin-opener-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "cross-origin-resource-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "origin-agent-cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "referrer-policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "strict-transport-security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "x-dns-prefetch-control",
+                  "value": "off"
+                },
+                {
+                  "key": "x-download-options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "x-frame-options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "x-permitted-cross-domain-policies",
+                  "value": "none"
+                },
+                {
+                  "key": "x-xss-protection",
+                  "value": "0"
+                },
+                {
+                  "key": "ratelimit-policy",
+                  "value": "10;w=900"
+                },
+                {
+                  "key": "ratelimit-limit",
+                  "value": "10"
+                },
+                {
+                  "key": "ratelimit-remaining",
+                  "value": "9"
+                },
+                {
+                  "key": "ratelimit-reset",
+                  "value": "900"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "218"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"da-qpw7lqtRj3eVlL2HyPernIU7diw\""
+                },
+                {
+                  "key": "date",
+                  "value": "Tue, 18 Aug 2026 16:13:32 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNzdhNTMzOGE5MWM2ODE5YzJmYjlhNyIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4NzA2OTYxMiwiZXhwIjoxNzg3MDczMjEyfQ.J-yD2p4oinm6uqTm8zRjkawq62LLhvug5SoL0mvGDEE\",\n  \"role\": \"admin\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Announcmments",
+      "item": [
+        {
+          "name": "Station Announcements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": [
+            {
+              "name": "Station Announcements",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5000/api/v1/stations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5000",
+                  "path": [
+                    "api",
+                    "v1",
+                    "stations"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "access-control-allow-credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "content-security-policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "cross-origin-opener-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "cross-origin-resource-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "origin-agent-cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "referrer-policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "strict-transport-security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "x-dns-prefetch-control",
+                  "value": "off"
+                },
+                {
+                  "key": "x-download-options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "x-frame-options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "x-permitted-cross-domain-policies",
+                  "value": "none"
+                },
+                {
+                  "key": "x-xss-protection",
+                  "value": "0"
+                },
+                {
+                  "key": "ratelimit-policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "ratelimit-limit",
+                  "value": "100"
+                },
+                {
+                  "key": "ratelimit-remaining",
+                  "value": "96"
+                },
+                {
+                  "key": "ratelimit-reset",
+                  "value": "214"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "3413"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"d55-MN7TX58b0VMC9r+cJ4adi9JYBy8\""
+                },
+                {
+                  "key": "date",
+                  "value": "Tue, 18 Aug 2026 16:17:42 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"_id\": \"6a7f2daf665f90353cf6b49c\",\n    \"name\": \"mosqo\",\n    \"line\": \"2\",\n    \"order\": 2,\n    \"governorate\": \"giza\",\n    \"city\": \"bnha\",\n    \"arrivalTime\": \"22:21\",\n    \"departureTime\": \"00:15\",\n    \"createdAt\": \"2026-08-14T15:01:03.612Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e11cfd88bee641a2c98\",\n    \"name\": \"Maasara\",\n    \"line\": \"Line 1\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:25.256Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e147b1c32cd0c755284\",\n    \"name\": \"Tora El-Asmant\",\n    \"line\": \"Line 1\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:28.749Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755285\",\n    \"name\": \"El-Malek El-Saleh\",\n    \"line\": \"Line 1\",\n    \"order\": 4,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.254Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755286\",\n    \"name\": \"Sadat\",\n    \"line\": \"Line 1\",\n    \"order\": 5,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.455Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755287\",\n    \"name\": \"New El-Marg\",\n    \"line\": \"Line 1\",\n    \"order\": 6,\n    \"governorate\": \"Cairo\",\n    \"city\": \"El-Marg\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.647Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e10cfd88bee641a2c97\",\n    \"name\": \"Helwan\",\n    \"line\": \"Line 1\",\n    \"order\": 12,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:24.630Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755288\",\n    \"name\": \"Shoubra El-Kheima\",\n    \"line\": \"Line 2\",\n    \"order\": 1,\n    \"governorate\": \"Qalyubia\",\n    \"city\": \"Shoubra El-Kheima\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.839Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c755289\",\n    \"name\": \"Koliet El-Zeraa\",\n    \"line\": \"Line 2\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Shubra\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.027Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528a\",\n    \"name\": \"Rod El-Farag\",\n    \"line\": \"Line 2\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Rod El-Farag\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.263Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528b\",\n    \"name\": \"Giza\",\n    \"line\": \"Line 2\",\n    \"order\": 4,\n    \"governorate\": \"Giza\",\n    \"city\": \"Giza\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.454Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528c\",\n    \"name\": \"El-Mounib\",\n    \"line\": \"Line 2\",\n    \"order\": 5,\n    \"governorate\": \"Giza\",\n    \"city\": \"Giza\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.644Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528d\",\n    \"name\": \"Attaba\",\n    \"line\": \"Line 3\",\n    \"order\": 1,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.832Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c75528e\",\n    \"name\": \"Bab El-Shaaria\",\n    \"line\": \"Line 3\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.078Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c75528f\",\n    \"name\": \"Abbassia\",\n    \"line\": \"Line 3\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Abbassia\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.346Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c755290\",\n    \"name\": \"Cairo Airport\",\n    \"line\": \"Line 3\",\n    \"order\": 4,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Airport\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.536Z\",\n    \"__v\": 0\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": [
+            {
+              "name": "Create Announcement",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\r\n{\"message\":\"Test announcement\"}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5000/api/v1/stations/6a7f2daf665f90353cf6b49c/announcements",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5000",
+                  "path": [
+                    "api",
+                    "v1",
+                    "stations",
+                    "6a7f2daf665f90353cf6b49c",
+                    "announcements"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "access-control-allow-credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "content-security-policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "cross-origin-opener-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "cross-origin-resource-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "origin-agent-cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "referrer-policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "strict-transport-security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "x-dns-prefetch-control",
+                  "value": "off"
+                },
+                {
+                  "key": "x-download-options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "x-frame-options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "x-permitted-cross-domain-policies",
+                  "value": "none"
+                },
+                {
+                  "key": "x-xss-protection",
+                  "value": "0"
+                },
+                {
+                  "key": "ratelimit-policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "ratelimit-limit",
+                  "value": "100"
+                },
+                {
+                  "key": "ratelimit-remaining",
+                  "value": "95"
+                },
+                {
+                  "key": "ratelimit-reset",
+                  "value": "573"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "150"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"96-sTuVTcUsoDDYCWmqgOws3IWtPCE\""
+                },
+                {
+                  "key": "date",
+                  "value": "Tue, 18 Aug 2026 16:28:46 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"stationId\": \"6a7f2daf665f90353cf6b49c\",\n  \"message\": \"Test announcement\",\n  \"_id\": \"6a84883ec258abfd6817f2f4\",\n  \"createdAt\": \"2026-08-18T16:28:46.306Z\",\n  \"__v\": 0\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stations",
+      "item": [
+        {
+          "name": "All Stations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": [
+            {
+              "name": "All Stations",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:5000/api/v1/stations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5000",
+                  "path": [
+                    "api",
+                    "v1",
+                    "stations"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "access-control-allow-credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "content-security-policy",
+                  "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+                },
+                {
+                  "key": "cross-origin-opener-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "cross-origin-resource-policy",
+                  "value": "same-origin"
+                },
+                {
+                  "key": "origin-agent-cluster",
+                  "value": "?1"
+                },
+                {
+                  "key": "referrer-policy",
+                  "value": "no-referrer"
+                },
+                {
+                  "key": "strict-transport-security",
+                  "value": "max-age=31536000; includeSubDomains"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "x-dns-prefetch-control",
+                  "value": "off"
+                },
+                {
+                  "key": "x-download-options",
+                  "value": "noopen"
+                },
+                {
+                  "key": "x-frame-options",
+                  "value": "SAMEORIGIN"
+                },
+                {
+                  "key": "x-permitted-cross-domain-policies",
+                  "value": "none"
+                },
+                {
+                  "key": "x-xss-protection",
+                  "value": "0"
+                },
+                {
+                  "key": "ratelimit-policy",
+                  "value": "100;w=900"
+                },
+                {
+                  "key": "ratelimit-limit",
+                  "value": "100"
+                },
+                {
+                  "key": "ratelimit-remaining",
+                  "value": "94"
+                },
+                {
+                  "key": "ratelimit-reset",
+                  "value": "268"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "3413"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"d55-MN7TX58b0VMC9r+cJ4adi9JYBy8\""
+                },
+                {
+                  "key": "date",
+                  "value": "Tue, 18 Aug 2026 16:33:51 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"_id\": \"6a7f2daf665f90353cf6b49c\",\n    \"name\": \"mosqo\",\n    \"line\": \"2\",\n    \"order\": 2,\n    \"governorate\": \"giza\",\n    \"city\": \"bnha\",\n    \"arrivalTime\": \"22:21\",\n    \"departureTime\": \"00:15\",\n    \"createdAt\": \"2026-08-14T15:01:03.612Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e11cfd88bee641a2c98\",\n    \"name\": \"Maasara\",\n    \"line\": \"Line 1\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:25.256Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e147b1c32cd0c755284\",\n    \"name\": \"Tora El-Asmant\",\n    \"line\": \"Line 1\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:28.749Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755285\",\n    \"name\": \"El-Malek El-Saleh\",\n    \"line\": \"Line 1\",\n    \"order\": 4,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.254Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755286\",\n    \"name\": \"Sadat\",\n    \"line\": \"Line 1\",\n    \"order\": 5,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.455Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755287\",\n    \"name\": \"New El-Marg\",\n    \"line\": \"Line 1\",\n    \"order\": 6,\n    \"governorate\": \"Cairo\",\n    \"city\": \"El-Marg\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.647Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e10cfd88bee641a2c97\",\n    \"name\": \"Helwan\",\n    \"line\": \"Line 1\",\n    \"order\": 12,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Helwan\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:24.630Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e157b1c32cd0c755288\",\n    \"name\": \"Shoubra El-Kheima\",\n    \"line\": \"Line 2\",\n    \"order\": 1,\n    \"governorate\": \"Qalyubia\",\n    \"city\": \"Shoubra El-Kheima\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:29.839Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c755289\",\n    \"name\": \"Koliet El-Zeraa\",\n    \"line\": \"Line 2\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Shubra\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.027Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528a\",\n    \"name\": \"Rod El-Farag\",\n    \"line\": \"Line 2\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Rod El-Farag\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.263Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528b\",\n    \"name\": \"Giza\",\n    \"line\": \"Line 2\",\n    \"order\": 4,\n    \"governorate\": \"Giza\",\n    \"city\": \"Giza\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.454Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528c\",\n    \"name\": \"El-Mounib\",\n    \"line\": \"Line 2\",\n    \"order\": 5,\n    \"governorate\": \"Giza\",\n    \"city\": \"Giza\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.644Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e167b1c32cd0c75528d\",\n    \"name\": \"Attaba\",\n    \"line\": \"Line 3\",\n    \"order\": 1,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:30.832Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c75528e\",\n    \"name\": \"Bab El-Shaaria\",\n    \"line\": \"Line 3\",\n    \"order\": 2,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Downtown\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.078Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c75528f\",\n    \"name\": \"Abbassia\",\n    \"line\": \"Line 3\",\n    \"order\": 3,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Abbassia\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.346Z\",\n    \"__v\": 0\n  },\n  {\n    \"_id\": \"6a7f1e177b1c32cd0c755290\",\n    \"name\": \"Cairo Airport\",\n    \"line\": \"Line 3\",\n    \"order\": 4,\n    \"governorate\": \"Cairo\",\n    \"city\": \"Airport\",\n    \"arrivalTime\": \"00:00\",\n    \"departureTime\": \"00:05\",\n    \"createdAt\": \"2026-08-14T13:54:31.536Z\",\n    \"__v\": 0\n  }\n]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

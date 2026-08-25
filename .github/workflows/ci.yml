@@ -1,0 +1,43 @@
+name: MetroSync CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Syntax check backend
+        run: find . -path './node_modules' -prune -o -name '*.js' -type f -print0 | xargs -0 -n1 node --check
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Syntax check frontend
+        run: |
+          for file in frontend/*.js; do node --check "$file"; done
+      - name: Validate frontend files
+        run: test -f frontend/index.html && test -f frontend/style.css
