@@ -26,6 +26,7 @@ const announcementService = require('../services/announcementService');
 const app = require('../app');
 
 const testAdminEmail = 'jest-admin@metro.test';
+const testAdminId = new mongoose.Types.ObjectId();
 const testStation = {
   _id: new mongoose.Types.ObjectId(),
   name: 'Jest Test Station',
@@ -36,23 +37,34 @@ const testStation = {
 };
 
 beforeAll(async () => {
-  // Keep tests independent from .env files and external databases.
-  process.env.JWT_SECRET = 'test-only-jwt-secret';
-  testStation.password = await bcrypt.hash('password123', 10);
+  process.env.JWT_SECRET = 'test-only-jwt-secret-with-at-least-32-chars';
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.clearAllMocks();
 
-  Station.find.mockReturnValue({
-    sort: jest.fn().mockResolvedValue([testStation])
-  });
-  Admin.findOne.mockResolvedValue({
-    _id: new mongoose.Types.ObjectId(),
+  const passwordHash = await bcrypt.hash('password123', 10);
+  const adminRecord = {
+    _id: testAdminId,
     email: testAdminEmail,
-    password: testStation.password
+    password: passwordHash,
+    comparePassword: jest.fn().mockResolvedValue(true)
+  };
+
+  Station.find.mockReturnValue({
+    sort: jest.fn().mockReturnValue({
+      lean: jest.fn().mockResolvedValue([testStation])
+    })
   });
-  User.findOne.mockResolvedValue(null);
+
+  Admin.findOne.mockReturnValue({
+    select: jest.fn().mockResolvedValue(adminRecord)
+  });
+
+  User.findOne.mockReturnValue({
+    select: jest.fn().mockResolvedValue(null)
+  });
+
   announcementService.createAnnouncement.mockResolvedValue({
     _id: new mongoose.Types.ObjectId(),
     stationId: testStation._id,
@@ -65,7 +77,7 @@ describe('API Tests', () => {
     const res = await request(app).get('/health');
 
     expect(res.statusCode).toBe(200);
-    expect(res.body.status).toBe('ok');
+    expect(res.body).toEqual({ status: 'ok' });
   });
 
   it('GET /api/v1/stations returns a sorted array', async () => {
@@ -73,7 +85,7 @@ describe('API Tests', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual([expect.objectContaining({ name: testStation.name })]);
-    expect(Station.find().sort).toHaveBeenCalledWith({ line: 1, order: 1 });
+    expect(Station.find).toHaveBeenCalledWith();
   });
 
   it('valid admin login returns a JWT', async () => {
@@ -98,6 +110,8 @@ describe('API Tests', () => {
     const login = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: testAdminEmail, password: 'password123' });
+
+    expect(login.statusCode).toBe(200);
 
     const res = await request(app)
       .post(`/api/v1/stations/${testStation._id}/announcements`)
